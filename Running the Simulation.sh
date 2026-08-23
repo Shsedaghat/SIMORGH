@@ -1,0 +1,1 @@
+python src/main_simulation.py --config configs/parameters.json --runs 50 --output data/raw_simulation_outputs.csv

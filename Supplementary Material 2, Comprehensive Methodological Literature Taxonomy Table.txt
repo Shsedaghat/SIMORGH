@@ -1,0 +1,25 @@
+# SUPPLEMENTARY MATERIAL 2: SYSTEMATIC METHODOLOGICAL COMPARISON TABLE
+
+Table S1 provides an in-depth comparative taxonomy of SIMORGH against relevant literature, 
+categorized across key architectural and mathematical methodologies.
+
+| Study | Blockage Modeling Method | Traffic Arrival Model | Routing & Path Selection Strategy | Optimization / Decision Framework | Architecture (Centralized / Distributed) | Computational Complexity |
+| :--- | :--- | :--- | :--- | :--- | :--- | :--- |
+| **Sefati et al. [18]** | Qualitative Survey / Deterministic | Static Poisson ($\text{M/M/1}$) | Heuristic / Surveyed taxonomy | Qualitative KPI trade-off analysis | Hybrid SDN-Edge survey | $\mathcal{O}(1)$ (Descriptive Survey) |
+| **Moltchanov et al. [9]** | Spatial Poisson Line Processes | Poisson / Non-elastic batch | Direct single/multi-hop session allocation | Resource queue state space analysis | Distributed / Base Station | $\mathcal{O}(2^N)$ (State explosion) |
+| **Abir et al. [10]** | Deterministic unobstructed | Poisson ($\text{M/M/1}$, $\text{M/M/k}$) | Least-loaded multi-controller forwarding | Static load-balancing heuristics | Multi-controller SDN + UAV Twin | $\mathcal{O}(|\mathcal{V}|^2)$ |
+| **Ghafoor et al. [3]** | Ray-tracing / Geometric attenuation | Deterministic / Empirical | Handover-centric link switching | Standard Mamdani Fuzzy Controller | Distributed vehicular nodes | $\mathcal{O}(R \cdot |\mathcal{V}|)$ |
+| **Pawar et al. [4]** | Qualitative Link Characterization | Heterogeneous empirical | Standard V2X flow forwarding | Qualitative MEC resource management | Hierarchical SDN/MEC | Descriptive Framework |
+| **Alshamrani et al. [5]** | Static attenuation model | Poisson process | Last-mile direct edge offloading | CPU scheduling via M/M/1 queues | Dense RSU Baseband Units | $\mathcal{O}(N \log N)$ |
+| **Biswas et al. [19]** | Empirical free-space loss | Generalized Poisson | Blockchain-authenticated V2X path | Consensus-driven edge resource allocation | Distributed Blockchain / Edge | $\mathcal{O}(B_{block} \cdot N^2)$ |
+| **Cui et al. [11]** | Static path-loss model | Zipf-distributed popularity | DRL-based (Deep Q-Network - DQN) | Reinforcement Learning / Q-value argmax | Hierarchical Edge-Cloud | $\mathcal{O}(|\mathcal{S}|^2 \cdot |\mathcal{A}|)$ |
+| **Giordani et al. [6]** | Two-state Markovian geometry | Uniform Poisson arrivals | Directional IAB beam access | Cross-layer heuristic beam management | Centralized gNB Control Plane | $\mathcal{O}(K \cdot N_{beams})$ |
+| **Li et al. [16]** | Deterministic SNR threshold | Poisson stream | Multi-stage fuzzy vertical handover | Pre-defined rule-based fuzzy logic | Local node-level controller | $\mathcal{O}(3 \cdot R_{stage})$ |
+| **Elloumi et al. [7]** | LSTM Recurrent Predictor | Generalized Poisson | Graph-theoretic shortest path (RAVEN) | NP-hard Mixed-Integer Non-Linear (MINLP) | Digital Twin Synchronized SDN | $\mathcal{O}(|\mathcal{V}|^3 + \text{LSTM cost})$ |
+| **Abuhdima et al. [8]** | Weather-driven empirical | Constant Bit Rate (CBR) | Proactive dual-band channel switching | Environmental Fuzzy Rule System | Local vehicle controller | $\mathcal{O}(R_{fuzzy})$ |
+| **Al-Mukhtar et al. [12]**| Fixed transmission range | Poisson arrival | Multi-path energy cluster routing | Whale Optimization Algorithm (WOA) | Distributed cluster heads | $\mathcal{O}(I_{iter} \cdot N_{whales} \cdot |\mathcal{V}|)$ |
+| **Saoud et al. [17]** | Surveyed link-layer models | Diverse Poisson / Pareto | AI-driven routing taxonomy | Swarm & fuzzy metaheuristic survey | Hybrid VANET paradigms | Descriptive / Survey |
+| **Hussain et al. [13]** | Dynamic SNR thresholding | Bursty Poisson approximation | Fuzzy CNN + Jellyfish Search | Dynamic Q-learning & Entropy weights | Onboard vehicular units | $\mathcal{O}(N_{pop} \cdot D + \text{CNN})$ |
+| **Ravi et al. [14]** | Stochastic Markov survey | M/Geo/1 discrete queues | SDN flow table matching | Analytical queueing state equations | Centralized SDN survey | Theoretical Survey |
+| **Ren et al. [15]** | Frequency-selective fading | Poisson arrivals | Adaptive OFDM index modulation | Rule-based fuzzy parameter tuning | Local transceiver DSP | $\mathcal{O}(N_{subcarriers})$ |
+| **SIMORGH (Proposed)**| **CTMC Alternating-Renewal ($\alpha, \beta$)** | **$m$-State MMPP Burst Characterization** | **Cross-Layer Stochastic Shortest Path** | **Differentiable FIS + KKT Convex Program** | **Hierarchical SDN Global Control** | **$\mathcal{O}(\sqrt{|\mathcal{E}|}(|\mathcal{F}||\mathcal{E}|)^{1.5})$ (Fast interior-point)** |

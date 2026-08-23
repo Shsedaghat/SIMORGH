@@ -1,0 +1,14 @@
+{
+  "carrier_frequency_GHz": [28, 73],
+  "channel_bandwidth_MHz": 500,
+  "node_count": [50, 100],
+  "simulation_duration_s": 100,
+  "urban_blockage_rate_alpha": 0.45,
+  "simorgh_recovery_rate_beta": 4.0,
+  "arrival_rate_pkts_s": [100, 600],
+  "peak_burst_rate_pkts_s": 1200,
+  "buffer_capacity_K": 100,
+  "service_rate_LoS_pkts_s": [1500, 2000],
+  "weight_fuzzy_penalty_phi": 0.6,
+  "weight_channel_penalty_psi": 0.4
+}

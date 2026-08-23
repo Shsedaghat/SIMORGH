@@ -1,0 +1,174 @@
+# SUPPLEMENTARY MATERIAL 1: MATHEMATICAL FOUNDATIONS & DERIVATIONS OF THE SIMORGH FRAMEWORK
+
+## S1. Continuous-Time Alternating-Renewal mmWave Link State Modeling
+
+Let the high-frequency mmWave wireless link between candidate vehicular nodes $(v_i, v_j)$ be modeled 
+as a two-state Continuous-Time Markov Chain (CTMC) $\{S_{ij}(t), t \ge 0\}$, where the state space is 
+$\mathcal{S} = \{0, 1\}$ (State $1 = \text{Line-of-Sight (LoS)}$, State $0 = \text{Blocked/Non-LoS}$).
+
+The infinitesimal transition generator matrix $\mathbf{Q}_{link}$ is given by:
+$$\mathbf{Q}_{link} = \begin{bmatrix} -\beta_{ij} & \beta_{ij} \\ \alpha_{ij} & -\alpha_{ij} \end{bmatrix}$$
+where:
+- $\alpha_{ij} > 0$ represents the Poisson blockage transition rate ($1 \to 0$),
+- $\beta_{ij} > 0$ represents the Poisson link recovery transition rate ($0 \to 1$).
+
+The forward Kolmogorov differential equations governing the transient state probabilities 
+$p_1(t) = \Pr\{S_{ij}(t) = 1\}$ and $p_0(t) = \Pr\{S_{ij}(t) = 0\}$ are:
+$$\frac{d p_1(t)}{dt} = -\alpha_{ij} p_1(t) + \beta_{ij} p_0(t)$$
+$$\frac{d p_0(t)}{dt} = \alpha_{ij} p_1(t) - \beta_{ij} p_0(t)$$
+
+Applying the conservation of total probability $p_0(t) + p_1(t) = 1$:
+$$\frac{d p_1(t)}{dt} + (\alpha_{ij} + \beta_{ij}) p_1(t) = \beta_{ij}$$
+
+Solving this linear first-order differential equation with initial condition $p_1(0)$:
+$$p_1(t) = \frac{\beta_{ij}}{\alpha_{ij} + \beta_{ij}} + \left( p_1(0) - \frac{\beta_{ij}}{\alpha_{ij} + \beta_{ij}} \right) e^{-(\alpha_{ij} + \beta_{ij})t}$$
+
+In steady-state ($t \to \infty$), the stationary LoS availability probability $p_{ij}^{LoS}$ converges to:
+$$p_{ij}^{LoS} = \lim_{t \to \infty} p_1(t) = \frac{\beta_{ij}}{\alpha_{ij} + \beta_{ij}}$$
+
+Given that the instantaneous physical-layer transmission service rate is $\mu_{ij}^{LoS}$ during LoS intervals 
+and $\mu_{ij}^{NLoS} \approx 0$ during complete blockage, the effective long-term service rate $\mu_{ij}^{eff}$ 
+is derived via renewal reward theory:
+$$\mu_{ij}^{eff} = \mathbb{E}[S_{ij}] \cdot \mu_{ij}^{LoS} + (1 - \mathbb{E}[S_{ij}]) \cdot \mu_{ij}^{NLoS} = \left(\frac{\beta_{ij}}{\alpha_{ij} + \beta_{ij}}\right) \mu_{ij}^{LoS}$$
+
+---
+
+## S2. Block-Structured Infinitesimal Generator of the MMPP/M/1/K Queue under Channel Interruptions
+
+Vehicular traffic arrival at node $v_i$ is governed by an $m$-state Markov-Modulated Poisson Process (MMPP) 
+parameterized by the underlying CTMC generator $\mathbf{Q}_A \in \mathbb{R}^{m \times m}$ and the diagonal 
+arrival rate matrix $\mathbf{\Lambda} = \text{diag}(\lambda_1, \lambda_2, \dots, \lambda_m)$.
+
+The instantaneous system state is characterized by the 3-dimensional continuous-time stochastic process:
+$$\mathcal{X}(t) = \big( X(t), S_{ij}(t), M(t) \big) \in \{0, 1, \dots, K\} \times \{0, 1\} \times \{1, \dots, m\}$$
+where:
+- $X(t) \in \{0, \dots, K\}$ is the discrete buffer occupancy (queue length),
+- $S_{ij}(t) \in \{0, 1\}$ is the wireless channel blockage state,
+- $M(t) \in \{1, \dots, m\}$ is the modulating phase of the arrival process.
+
+Ordering the composite state lexicographically as $(n, s, e)$, where $n \in \{0, \dots, K\}$, $s \in \{0, 1\}$, 
+and $e \in \{1, \dots, m\}$, the overall system generator matrix $\mathbf{G} \in \mathbb{R}^{2m(K+1) \times 2m(K+1)}$ 
+is a block-tridiagonal matrix:
+
+$$\mathbf{G} = \begin{bmatrix}
+\mathbf{A}_{0,0} & \mathbf{A}_0 & \mathbf{0} & \dots & \mathbf{0} & \mathbf{0} \\
+\mathbf{A}_2 & \mathbf{A}_1 & \mathbf{A}_0 & \dots & \mathbf{0} & \mathbf{0} \\
+\mathbf{0} & \mathbf{A}_2 & \mathbf{A}_1 & \dots & \mathbf{0} & \mathbf{0} \\
+\vdots & \vdots & \ddots & \ddots & \ddots & \vdots \\
+\mathbf{0} & \mathbf{0} & \dots & \mathbf{A}_2 & \mathbf{A}_1 & \mathbf{A}_0 \\
+\mathbf{0} & \mathbf{0} & \dots & \mathbf{0} & \mathbf{A}_2 & \mathbf{A}_{K,K}
+\end{bmatrix}$$
+
+The constituent sub-matrices of dimension $2m \times 2m$ are defined as Kronecker sums ($\oplus$) and products ($\otimes$):
+1. **Transition without buffer changes ($\mathbf{A}_1$):**
+   $$\mathbf{A}_1 = (\mathbf{Q}_{link} \otimes \mathbf{I}_m) + (\mathbf{I}_2 \otimes \mathbf{Q}_A) - \begin{bmatrix} \mathbf{0} & \mathbf{0} \\ \mathbf{0} & \mu_{ij}^{LoS} \mathbf{I}_m \end{bmatrix} - (\mathbf{I}_2 \otimes \mathbf{\Lambda})$$
+2. **Packet arrival transitions ($\mathbf{A}_0$, $n \to n+1$):**
+   $$\mathbf{A}_0 = \mathbf{I}_2 \otimes \mathbf{\Lambda}$$
+3. **Packet departure transitions ($\mathbf{A}_2$, $n \to n-1$):**
+   $$\mathbf{A}_2 = \begin{bmatrix} \mathbf{0} & \mathbf{0} \\ \mathbf{0} & \mu_{ij}^{LoS} \mathbf{I}_m \end{bmatrix}$$
+4. **Boundary conditions:**
+   $$\mathbf{A}_{0,0} = (\mathbf{Q}_{link} \otimes \mathbf{I}_m) + (\mathbf{I}_2 \otimes \mathbf{Q}_A) - (\mathbf{I}_2 \otimes \mathbf{\Lambda})$$
+   $$\mathbf{A}_{K,K} = (\mathbf{Q}_{link} \otimes \mathbf{I}_m) + (\mathbf{I}_2 \otimes \mathbf{Q}_A) - \begin{bmatrix} \mathbf{0} & \mathbf{0} \\ \mathbf{0} & \mu_{ij}^{LoS} \mathbf{I}_m \end{bmatrix}$$
+
+The stationary probability vector $\mathbf{\Pi} = [\mathbf{\pi}_0, \mathbf{\pi}_1, \dots, \mathbf{\pi}_K]$ is uniquely determined by solving:
+$$\mathbf{\Pi} \mathbf{G} = \mathbf{0}, \quad \mathbf{\Pi} \mathbf{e} = 1$$
+
+From $\mathbf{\Pi}$, exact performance measures are directly obtained:
+- **Marginal Buffer Probability:** $P_i(n) = \sum_{s=0}^1 \sum_{e=1}^m \pi(n, s, e)$
+- **Packet Blocking Probability:** $P_{block,i} = P_i(K) = \sum_{s=0}^1 \sum_{e=1}^m \pi(K, s, e)$
+- **Mean Queue Length:** $L_i = \sum_{n=0}^K n P_i(n)$
+- **Mean System Sojourn Time (via Little's Law):**
+  $$W_i = \frac{L_i}{\bar{\lambda}_i (1 - P_{block,i})}, \quad \text{where } \bar{\lambda}_i = \mathbf{\pi}_A \mathbf{\Lambda} \mathbf{e}$$
+
+---
+
+## S3. Mathematical Proof of Convexity and KKT Stationarity for Flow-Assignment
+
+### Problem Formulation
+Let $\mathcal{G} = (\mathcal{V}, \mathcal{E})$ be the SDN-managed IoV graph. For a set of concurrent traffic flows $\mathcal{F}$, each flow $f \in \mathcal{F}$ possesses a rate requirement $r_f \ge 0$, a source $s_f$, and a destination $t_f$. Let $x_{ij}^f \in [0, 1]$ denote the fraction of flow $f$ routed through directed link $(i, j) \in \mathcal{E}$.
+
+The total aggregated flow traversing link $(i, j)$ is $y_{ij} = \sum_{f \in \mathcal{F}} r_f x_{ij}^f$.
+
+The centralized routing optimization problem is formulated as:
+$$\min_{\mathbf{x}} \Phi(\mathbf{x}) = \sum_{(i, j) \in \mathcal{E}} \left( y_{ij} \cdot \mathbb{E}[D_{ij}(y_{ij})] + \lambda_{fuzz} \mathcal{C}_{ij}(S_{ij}^*) \right)$$
+subject to:
+$$\sum_{j: (i,j) \in \mathcal{E}} x_{ij}^f - \sum_{k: (k,i) \in \mathcal{E}} x_{ki}^f = b_i^f, \quad \forall i \in \mathcal{V}, \forall f \in \mathcal{F} \quad (\text{Multiplier } \nu_i^f)$$
+$$y_{ij} = \sum_{f \in \mathcal{F}} r_f x_{ij}^f \le C_{ij}^{eff} = \mu_{ij}^{eff} (1 - P_{block,ij}), \quad \forall (i, j) \in \mathcal{E} \quad (\text{Multiplier } \lambda_{ij} \ge 0)$$
+$$0 \le x_{ij}^f \le 1, \quad \forall (i, j) \in \mathcal{E}, \forall f \in \mathcal{F} \quad (\text{Multipliers } \xi_{ij}^{f,-}, \xi_{ij}^{f,+} \ge 0)$$
+
+where:
+$$b_i^f = \begin{cases} 1, & \text{if } i = s_f \\ -1, & \text{if } i = t_f \\ 0, & \text{otherwise} \end{cases}$$
+
+### Convexity Proof of the Delay Objective
+The per-hop expected latency is given by:
+$$\mathbb{E}[D_{ij}(y_{ij})] = \frac{1}{\mu_{ij}^{eff} - y_{ij}} + \tau_{ij}^{tx} + \tau_{ij}^{ctrl}$$
+
+Thus, the link delay cost component is $f_{ij}(y_{ij}) = y_{ij} \cdot \mathbb{E}[D_{ij}(y_{ij})] = \frac{y_{ij}}{\mu_{ij}^{eff} - y_{ij}} + y_{ij}(\tau_{ij}^{tx} + \tau_{ij}^{ctrl})$.
+
+Taking the first and second derivatives with respect to $y_{ij}$ over the domain $y_{ij} \in [0, C_{ij}^{eff})$ where $C_{ij}^{eff} < \mu_{ij}^{eff}$:
+$$f'_{ij}(y_{ij}) = \frac{\mu_{ij}^{eff}}{(\mu_{ij}^{eff} - y_{ij})^2} + (\tau_{ij}^{tx} + \tau_{ij}^{ctrl})$$
+$$f''_{ij}(y_{ij}) = \frac{2 \mu_{ij}^{eff}}{(\mu_{ij}^{eff} - y_{ij})^3}$$
+
+Since $\mu_{ij}^{eff} > 0$ and $y_{ij} < \mu_{ij}^{eff}$, the denominator $(\mu_{ij}^{eff} - y_{ij})^3 > 0$. Consequently:
+$$f''_{ij}(y_{ij}) > 0, \quad \forall y_{ij} \in [0, C_{ij}^{eff})$$
+
+Because $y_{ij}(\mathbf{x}) = \sum_{f} r_f x_{ij}^f$ is an affine transformation of $\mathbf{x}$, the composite objective function $\Phi(\mathbf{x})$ is strictly convex. All constraints are linear affine equalities and inequalities; therefore, Slater's condition is satisfied, establishing that the optimization problem is a strictly convex program with a unique global optimum.
+
+### Lagrangian and KKT Optimality Conditions
+The Lagrangian function $\mathcal{L}(\mathbf{x}, \mathbf{\nu}, \mathbf{\lambda}, \mathbf{\xi})$ is:
+$$\mathcal{L} = \sum_{(i,j)} f_{ij}\left(\sum_f r_f x_{ij}^f\right) + \lambda_{fuzz} \sum_{(i,j)} \mathcal{C}_{ij}(S_{ij}^*) + \sum_f \sum_i \nu_i^f \left( \sum_j x_{ij}^f - \sum_k x_{ki}^f - b_i^f \right) + \sum_{(i,j)} \lambda_{ij} \left( \sum_f r_f x_{ij}^f - C_{ij}^{eff} \right) - \sum_f \sum_{(i,j)} \xi_{ij}^{f,-} x_{ij}^f + \sum_f \sum_{(i,j)} \xi_{ij}^{f,+} (x_{ij}^f - 1)$$
+
+The Karush-Kuhn-Tucker (KKT) stationarity condition is:
+$$\frac{\partial \mathcal{L}}{\partial x_{ij}^f} = r_f \left[ \frac{\mu_{ij}^{eff}}{(\mu_{ij}^{eff} - y_{ij}^*)^2} + \tau_{ij}^{tx} + \tau_{ij}^{ctrl} \right] + (\nu_i^f - \nu_j^f) + r_f \lambda_{ij}^* - \xi_{ij}^{f,-} + \xi_{ij}^{f,+} = 0$$
+
+Complementary Slackness:
+$$\lambda_{ij}^* \left( \sum_f r_f x_{ij}^{f,*} - C_{ij}^{eff} \right) = 0, \quad \lambda_{ij}^* \ge 0$$
+$$\xi_{ij}^{f,-} x_{ij}^{f,*} = 0, \quad \xi_{ij}^{f,+} (x_{ij}^{f,*} - 1) = 0, \quad \xi_{ij}^{f,-}, \xi_{ij}^{f,+} \ge 0$$
+
+**Physical Interpretation of Shadow Price $\lambda_{ij}^*$:**
+The Lagrange multiplier $\lambda_{ij}^*$ represents the marginal increase in global network latency incurred when link capacity $C_{ij}^{eff}$ is reduced by 1 unit:
+$$\lambda_{ij}^* = \left[ - \frac{\partial \Phi(\mathbf{x}^*)}{\partial C_{ij}^{eff}} \right] = \max\left(0, \frac{\nu_j^f - \nu_i^f}{r_f} - \left[ \frac{\mu_{ij}^{eff}}{(\mu_{ij}^{eff} - y_{ij}^*)^2} + \tau_{ij}^{tx} + \tau_{ij}^{ctrl} \right]\right)$$
+The SDN controller directly uses $\lambda_{ij}^*$ to apply dynamic penalties to volatile or congested links.
+
+---
+
+## S4. Proof of Differentiability for the Multi-Input Fuzzy Inference System (FIS)
+
+To resolve non-differentiability arising from traditional $\min / \max$ Mamdani operators, the SIMORGH fuzzy engine is formulated strictly with analytical, infinitely differentiable ($\mathcal{C}^\infty$) operations:
+
+1. **Continuous Membership Functions:**
+   - Queue Length / Delay: Generalized Gaussian basis: $\mu_X^{(k)}(x) = \exp\left(-\frac{(x - m_k)^2}{2\sigma_k^2}\right)$
+   - mmWave LoS Probability: Smooth Sigmoidal mapping: $\mu_{LoS}^{High}(x) = \frac{1}{1 + e^{-\gamma(x - \theta_1)}}$
+2. **Smooth Product T-Norm for Rule Conjunction:**
+   $$\omega_k(\mathbf{x}) = \prod_{i=1}^5 \mu_{X_i}^{(k)}(x_i)$$
+   Since the product of smooth differentiable functions is strictly smooth, $\frac{\partial \omega_k}{\partial x_i}$ exists and is continuous everywhere on $\mathbb{R}^5$.
+3. **Centroid Defuzzification:**
+   $$S_{ij}^*(\mathbf{x}) = \frac{\sum_{k=1}^R \omega_k(\mathbf{x}) \cdot c_k \cdot A_k}{\sum_{k=1}^R \omega_k(\mathbf{x}) \cdot A_k}$$
+   where $c_k$ is the centroid and $A_k$ is the area of the output membership function for rule $k$.
+
+Since the denominator $\sum_{k=1}^R \omega_k(\mathbf{x}) A_k > 0$ for all valid physical domains $\mathcal{D}_X$, $S_{ij}^*(\mathbf{x})$ is a rational function of smooth primitives and is therefore continuous and differentiable ($\mathcal{C}^1$):
+$$\nabla_{\mathbf{x}} S_{ij}^*(\mathbf{x}) = \frac{\left(\sum_k A_k \nabla \omega_k\right)\left(\sum_k c_k A_k \omega_k\right) - \left(\sum_k c_k A_k \nabla \omega_k\right)\left(\sum_k A_k \omega_k\right)}{\left(\sum_k A_k \omega_k\right)^2}$$
+
+This ensures that the fuzzy penalty $\mathcal{C}_{ij}(S_{ij}^*) = \rho(1 - S_{ij}^*)^k$ is fully compatible with gradient-based path updates.
+
+---
+
+## S5. Computational Complexity Analysis in Big-$\mathcal{O}$ Notation
+
+The total computational complexity of the SIMORGH framework within the SDN Global Controller per optimization cycle consists of three sequential stages:
+
+1. **MMPP/M/1/K Local Steady-State Evaluation:**
+   Evaluating the stationary distribution vector $\mathbf{\Pi}$ requires solving the block-tridiagonal linear system of size $2m(K+1)$. Using the Block Gauss-Seidel or Block Tridiagonal Elimination Algorithm, the complexity per link is:
+   $$\mathcal{O}\Big(|\mathcal{E}| \cdot (K+1) \cdot (2m)^3\Big)$$
+   Given fixed small phase count $m = 2$ and buffer capacity $K = 100$, this stage scales linearly with the number of edges: $\mathcal{O}(|\mathcal{E}|)$.
+
+2. **Differentiable Fuzzy Relay Scoring Engine:**
+   For each candidate directional link $(i, j) \in \mathcal{E}$, computing the firing strengths across $R$ rules ($R = 32$) over 5 input variables scales as:
+   $$\mathcal{O}(|\mathcal{E}| \cdot R \cdot 5) = \mathcal{O}(|\mathcal{E}|)$$
+
+3. **KKT Flow-Assignment Convex Optimization:**
+   The convex network flow problem with $|\mathcal{F}|$ active flows and $|\mathcal{E}|$ links is solved using the Primal-Dual Interior-Point Method (IPM). The Newton step system requires solving a symmetric positive-definite Karush-Kuhn-Tucker system of size $\mathcal{O}(|\mathcal{F}| \cdot |\mathcal{E}| + |\mathcal{V}| \cdot |\mathcal{F}|)$, which yields an overall worst-case complexity of:
+   $$\mathcal{O}\left( \sqrt{|\mathcal{E}|} \cdot \log\left(\frac{1}{\epsilon}\right) \cdot (|\mathcal{F}| \cdot |\mathcal{E}|)^{1.5} \right)$$
+   where $\epsilon > 0$ is the desired optimization duality gap tolerance ($10^{-4}$).
+
+For single-path stochastic shortest path dispatching (Dijkstra with dynamic KKT shadow prices), the runtime reduces to $\mathcal{O}\big(|\mathcal{E}| + |\mathcal{V}|\log|\mathcal{V}|\big)$, guaranteeing real-time millisecond execution in dense vehicular topologies.

@@ -1,0 +1,14 @@
+SIMORGH-Routing-Core/
+├── configs/
+│   ├── sumo_urban_config.sumocfg
+│   ├── sumo_highway_config.sumocfg
+│   └── parameters.json
+├── src/
+│   ├── mmwave_channel.py      # CTMC alternating-renewal LoS/NLoS model
+│   ├── mmpp_traffic.py        # Markov-Modulated Poisson Process generator
+│   ├── queue_system.py        # SimPy discrete-event finite queue engine
+│   ├── fuzzy_engine.py        # Analytical differentiable FIS implementation
+│   ├── sdn_optimizer.py       # KKT-based convex program & Dijkstra router
+│   └── main_simulation.py     # Main benchmark evaluation loop
+└── data/
+    └── raw_simulation_outputs.csv
